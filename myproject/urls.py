@@ -18,7 +18,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
 
-    # ✅ Add webmail redirect
+    # ✅ Webmail redirect → goes to cPanel login port (no loop)
     path("webmail/", RedirectView.as_view(
         url=settings.WEBMAIL_URL,
         permanent=False
