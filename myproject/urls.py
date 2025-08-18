@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic.base import RedirectView   # 👈 Import this
+from django.views.generic.base import RedirectView
+from myapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -18,18 +18,13 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
 
-    # 👇 Add this for Webmail redirect
-    path(
-        "webmail/",
-        RedirectView.as_view(
-            url="https://www.eagleyesecurityservice.com:2096",
-            permanent=False
-        ),
-        name="webmail_redirect"
-    ),
+    # ✅ Add webmail redirect
+    path("webmail/", RedirectView.as_view(
+        url=settings.WEBMAIL_URL,
+        permanent=False
+    ), name="webmail_redirect"),
 ]
 
-# Only serve local media/static during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.ABOUT_IMAGES_URL, document_root=settings.ABOUT_IMAGES_ROOT)

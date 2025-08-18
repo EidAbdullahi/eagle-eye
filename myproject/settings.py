@@ -136,3 +136,5 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 3600
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+# settings.py
+WEBMAIL_URL = "https://www.eagleyesecurityservice.com:2096"
