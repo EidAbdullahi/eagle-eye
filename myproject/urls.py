@@ -3,12 +3,7 @@ from django.urls import path
 from myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import redirect   # 👈 added
-
-# redirect view for /webmail
-def webmail_redirect(request):
-    # redirect users to the actual cPanel webmail login
-    return redirect("https://www.eagleyesecurityservice.com:2096")
+from django.views.generic.base import RedirectView   # 👈 Import this
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,7 +17,16 @@ urlpatterns = [
     path('contact/', views.contact, name="contact"),
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
-    path('webmail/', webmail_redirect, name='webmail'),  # 👈 added
+
+    # 👇 Add this for Webmail redirect
+    path(
+        "webmail/",
+        RedirectView.as_view(
+            url="https://www.eagleyesecurityservice.com:2096",
+            permanent=False
+        ),
+        name="webmail_redirect"
+    ),
 ]
 
 # Only serve local media/static during development
