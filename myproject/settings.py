@@ -1,19 +1,24 @@
 """
-Django settings for eagle-eye security service.
-Optimized for cPanel deployment with MySQL.
+Django settings for Eagle Eye Security Service.
+Optimized for cPanel deployment with MySQL and static file handling.
 """
-from django.db.backends.mysql.base import DatabaseWrapper
-
-DatabaseWrapper.mysql_is_mariadb = property(lambda self: False)
-# MySQL Support - MUST BE FIRST
-import pymysql
-pymysql.install_as_MySQLdb()
 
 import os
 from pathlib import Path
 from decouple import config, Csv
+import pymysql
 
-# Build paths
+# ============================================================================
+# DATABASE CONFIGURATION
+# ============================================================================
+from django.db.backends.mysql.base import DatabaseWrapper
+DatabaseWrapper.mysql_is_mariadb = property(lambda self: False)
+
+pymysql.install_as_MySQLdb()
+
+# ============================================================================
+# BUILD PATHS
+# ============================================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
@@ -23,11 +28,10 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# For local development, allow all hosts
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='https://eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
 
 # ============================================================================
 # APPLICATION DEFINITION
@@ -45,7 +49,9 @@ INSTALLED_APPS = [
     'cloudinary_storage',
 ]
 
+# WhiteNoise for static files
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # MUST be first for static files
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,14 +82,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 # ============================================================================
-# DATABASE CONFIGURATION
+# DATABASE
 # ============================================================================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'eagleyesecuritys_eagle_eye_db',   # exact DB name from cPanel
-        'USER': 'eagleyesecuritys_eagle_user',    # exact DB user from cPanel
-        'PASSWORD': 'EagleUser@123',              # DB user password
+        'NAME': 'eagleyesecuritys_eagle_eye_db',
+        'USER': 'eagleyesecuritys_eagle_user',
+        'PASSWORD': 'EagleUser@123',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -111,8 +117,15 @@ USE_TZ = True
 # STATIC FILES
 # ============================================================================
 STATIC_URL = '/static/'
+
+# Local project static files
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Where collectstatic will put files for production
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ============================================================================
 # MEDIA FILES
@@ -147,10 +160,9 @@ ABOUT_IMAGES_ROOT = os.path.join(BASE_DIR, 'about_images')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================================================
-# CRITICAL: DISABLE ALL HTTPS FOR LOCAL DEVELOPMENT
+# SECURITY FOR DEVELOPMENT / PRODUCTION
 # ============================================================================
 if DEBUG:
-    # Completely disable HTTPS redirects for local development
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
@@ -160,7 +172,6 @@ if DEBUG:
     SECURE_BROWSER_XSS_FILTER = False
     SECURE_CONTENT_TYPE_NOSNIFF = False
 else:
-    # Production settings
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -169,8 +180,3 @@ else:
     SECURE_HSTS_PRELOAD = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
-    
-    
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # or os.path.join(BASE_DIR, 'staticfiles')
