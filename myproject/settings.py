@@ -80,16 +80,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # ============================================================================
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': config('DB_NAME', default='eagle_eye_db'),
-        'USER': config('DB_USER', default='eagle_user'),
-        'PASSWORD': config('DB_PASSWORD', default='YourStrongPassword123!'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'eagleyesecuritys_eagle_eye_db',   # exact DB name from cPanel
+        'USER': 'eagleyesecuritys_eagle_user',    # exact DB user from cPanel
+        'PASSWORD': 'EagleUser@123',              # DB user password
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
