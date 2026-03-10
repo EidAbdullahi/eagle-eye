@@ -2,7 +2,9 @@
 Django settings for eagle-eye security service.
 Optimized for cPanel deployment with MySQL.
 """
+from django.db.backends.mysql.base import DatabaseWrapper
 
+DatabaseWrapper.mysql_is_mariadb = property(lambda self: False)
 # MySQL Support - MUST BE FIRST
 import pymysql
 pymysql.install_as_MySQLdb()
