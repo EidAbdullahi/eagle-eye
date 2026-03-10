@@ -5,7 +5,7 @@ Optimized for cPanel deployment with MySQL and static file handling.
 
 import os
 from pathlib import Path
-from decouple import config, Csv
+from decouple import config
 import pymysql
 
 # ============================================================================
@@ -14,10 +14,11 @@ import pymysql
 from django.db.backends.mysql.base import DatabaseWrapper
 DatabaseWrapper.mysql_is_mariadb = property(lambda self: False)
 
+# Use PyMySQL as MySQLdb
 pymysql.install_as_MySQLdb()
 
 # ============================================================================
-# BUILD PATHS
+# PATH CONFIGURATION
 # ============================================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -34,9 +35,10 @@ else:
     ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
 
 # ============================================================================
-# APPLICATION DEFINITION
+# INSTALLED APPS
 # ============================================================================
 INSTALLED_APPS = [
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,12 +46,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+
+    # Your apps
     'myapp',
+
+    # Third-party apps
     'cloudinary',
     'cloudinary_storage',
+    'django_extensions',  # optional, useful for runserver_plus
 ]
 
-# WhiteNoise for static files
+# ============================================================================
+# MIDDLEWARE
+# ============================================================================
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  # MUST be first for static files
     'django.middleware.security.SecurityMiddleware',
@@ -117,14 +126,8 @@ USE_TZ = True
 # STATIC FILES
 # ============================================================================
 STATIC_URL = '/static/'
-
-# Local project static files
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# Where collectstatic will put files for production
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# WhiteNoise storage
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Local static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')    # collectstatic target
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ============================================================================
@@ -134,7 +137,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ============================================================================
-# CLOUDINARY SETTINGS
+# CLOUDINARY STORAGE
 # ============================================================================
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
@@ -160,9 +163,10 @@ ABOUT_IMAGES_ROOT = os.path.join(BASE_DIR, 'about_images')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================================================
-# SECURITY FOR DEVELOPMENT / PRODUCTION
+# SECURITY SETTINGS FOR DEV/PRODUCTION
 # ============================================================================
 if DEBUG:
+    # Development: no HTTPS enforcement
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
@@ -172,6 +176,7 @@ if DEBUG:
     SECURE_BROWSER_XSS_FILTER = False
     SECURE_CONTENT_TYPE_NOSNIFF = False
 else:
+    # Production: enforce HTTPS & security headers
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
