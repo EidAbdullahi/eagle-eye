@@ -27,7 +27,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='https://eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
 
 # ============================================================================
 # APPLICATION DEFINITION
