@@ -1,3 +1,5 @@
+
+
 """
 Django settings for Eagle Eye Security Service
 Optimized for development + cPanel production deployment
@@ -37,13 +39,12 @@ DEBUG = config(
     cast=bool
 )
 
+
+
 if DEBUG:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+    ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = config(
-        "ALLOWED_HOSTS",
-        default="eagleyesecurityservice.com,www.eagleyesecurityservice.com"
-    ).split(",")
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='eagleyesecurityservice.com,www.eagleyesecurityservice.com').split(',')
 
 # ============================================================================
 # Applications
